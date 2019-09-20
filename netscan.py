@@ -5,6 +5,7 @@ import os
 from socket import inet_aton
 import struct
 
+
 def pinger(job_q, results_q):
     devnull = open(os.devnull, 'w')
     while True:
@@ -20,6 +21,7 @@ def pinger(job_q, results_q):
 
 # --------------------------------------------------------------------------------------------------
 if __name__ == "__main__":
+    subnet = int(input("enter the subnet you want to scan (172.16._.0): "))
     # initialize list
     iplist = []
     # multiprocessing for fast pings
@@ -33,7 +35,7 @@ if __name__ == "__main__":
         p.start()
 
     for i in range(1, 255):
-        jobs.put('172.16.5.{0}'.format(i))
+        jobs.put(('172.16.%i.{0}'.format(i)) % subnet)
 
     for p in pool:
         jobs.put(None)
@@ -44,10 +46,8 @@ if __name__ == "__main__":
     while not results.empty():
         ip = results.get()
         iplist.append(ip)
-        #print(ip)
 
     # sort and print the list
     iplist.sort(key=lambda s: map(int, s.split('.')))
-    #print("".join(iplist))
     for i in zip(iplist):
         print(''.join(i))
